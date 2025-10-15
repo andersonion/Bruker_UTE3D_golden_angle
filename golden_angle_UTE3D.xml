@@ -102,6 +102,18 @@ Description: Layout of routine parameter editor for method UTE3D.
                 <parameter name="GradSync"/>
             </column>
         </parameterCard>
+                <!-- ======================================================
+             Golden-Angle / Kronecker Trajectory Controls
+             ====================================================== -->
+        <parameterCard displayName="Trajectory Options">
+            <column>
+                <parameter name="GA_Mode"           displayName="Trajectory Mode"/>
+                <parameter name="GA_UseFibonacci"   displayName="Force Fibonacci Spoke Count"/>
+                <parameter name="GA_NSpokesReq"     displayName="Requested Number of Spokes"/>
+                <parameter name="GA_NSpokesEff"     displayName="Effective Number of Spokes"/>
+            </column>
+        </parameterCard>
+
         <xi:include href="file:///XML_INCLUDE_DIR/Trajectory.xml"/>
         <xi:include href="file:///XML_INCLUDE_DIR/Freq1.xml"/>
         <xi:include href="file:///XML_INCLUDE_DIR/Tx1.xml"/>  

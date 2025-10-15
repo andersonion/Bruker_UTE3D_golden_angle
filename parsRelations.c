@@ -317,3 +317,11 @@ void SlewRateRange(void)
   
   DB_MSG(("<--SlewRateRange"));
 }
+
+void GA_UpdateSpokesRel(void)
+{
+    if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
+    GA_NSpokesEff = (GA_UseFibonacci == Yes)
+                      ? fib_closest_ge(GA_NSpokesReq)
+                      : GA_NSpokesReq;
+}

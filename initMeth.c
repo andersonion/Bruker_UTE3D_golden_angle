@@ -23,7 +23,13 @@ static const char resid[] = "$Id: initMeth.c,v 1.31 2013/05/22 10:55:23 sako Exp
 
 
 #include "method.h"
-
+/* ---- Fibonacci helpers ---- */
+static int fib_closest_ge(int n){ if(n<=1) return 1; int a=1,b=1; while(b<n){int t=a+b;a=b;b=t;} return b; }
+static int fib_floor(int n)     { if(n<=1) return 1; int a=1,b=1; while(b<=n){int t=a+b;a=b;b=t;} return a; }
+static int fib_prev(int fk)     { /* return previous Fibonacci given fk */ 
+    if (fk<=1) return 1; int a=1,b=1; while(b<fk){int t=a+b;a=b;b=t;} return a;
+}
+static int fib_prev2(int fk)    { int p=fib_prev(fk); return fib_prev(p); }
 
 
 void initMeth()
@@ -82,6 +88,13 @@ void initMeth()
   ParxRelsMakeNonEditable("NPro");
   ProUnderRange();
   ReadGradLim = 100.0;
+
+	/* ---- Golden-angle / Kronecker setup ---- */
+	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
+	GA_NSpokesEff = (GA_UseFibonacci == Yes)
+					  ? fib_closest_ge(GA_NSpokesReq)
+					  : GA_NSpokesReq;
+
 
   if(ParxRelsParHasValue("YesNoMinEchoTime") == 0)
     YesNoMinEchoTime = Yes;

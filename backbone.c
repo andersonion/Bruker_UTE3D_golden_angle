@@ -22,6 +22,36 @@ static const char resid[] = "$Id: backbone.c,v 1.24 2013/08/29 12:31:35 sako Exp
 
 #include "method.h"
 
+/* ==== Golden-angle / Kronecker helpers ========================= */
+
+static int fib_closest_ge(int n){ if(n<=1) return 1; int a=1,b=1; while(b<n){int t=a+b;a=b;b=t;} return b; }
+static int fib_prev(int fk){ if(fk<=1) return 1; int a=1,b=1; while(b<fk){int t=a+b;a=b;b=t;} return a; }
+static int fib_prev2(int fk){ int p=fib_prev(fk); return fib_prev(p); }
+
+static inline void uv_to_dir(double u,double v,double *dx,double *dy,double *dz){
+  double z=1.0-2.0*u;
+  double r=sqrt(MAX(0.0,1.0-z*z));
+  double az=2.0*M_PI*v;
+  *dx=r*cos(az); *dy=r*sin(az); *dz=z;
+}
+
+static void kronecker_dir(long i,long N,double *dx,double *dy,double *dz){
+  int M=fib_closest_ge((int)N);
+  int q1=fib_prev(M), q2=fib_prev2(M);
+  int j=(int)(i%M);
+  double u=((j*(long long)q1)%M+0.5)/(double)M;
+  double v=((j*(long long)q2)%M+0.5)/(double)M;
+  uv_to_dir(u,v,dx,dy,dz);
+}
+
+static void linZ_ga_dir(long i,long N,double *dx,double *dy,double *dz){
+  const double phi_inc=(sqrt(5.0)-1.0)*M_PI;
+  double z=1.0-2.0*((i+0.5)/(double)N);
+  double r=sqrt(MAX(0.0,1.0-z*z));
+  double az=fmod(i*phi_inc,2.0*M_PI);
+  *dx=r*cos(az); *dy=r*sin(az); *dz=z;
+}
+
 
 void backbone(void)
 {
@@ -364,44 +394,194 @@ void SetNPro(void)
     }
 
     CalcNPro(); 
-
+  /* --- override NPro if using GA modes --- */
+  if (strcmp(GA_Mode, "UTE3D") != 0)
+  {
+    NPro = GA_NSpokesEff;
+    DB_MSG(("GA mode active (%s): NPro overridden to %d", GA_Mode, NPro));
+  }
+	
     DB_MSG(("ProUnderSampling = %.4f, NPro = %d", ProUndersampling, NPro));
   }
 }
 
 /* calculate radial projections */
 int SetProj3D( double *r,
-	       double *p,
-	       double *s,
-	       const double gr,
-	       const double gp,
-	       const double gs)
+               double *p,
+               double *s,
+               const double gr,
+               const double gp,
+               const double gs)
 {
-  int i,j, k=0;
-  double pi,angle;
-  int size = PVM_EncMatrix[0];
-  int n_phi=0;
-  int n_theta=0;
-
-  pi=M_PI;
-  angle = 2 * pi;
-  n_theta = (int) ((pi * size)/(2*ProUndersampling));
-  
-  for(j=0; j<n_theta;j++)
+  /* packaged UTE3D: keep vendor spherical grid */
+  if (strcmp(GA_Mode, "UTE3D") == 0)
   {
-    //theta = (int) (pi*j/n_theta);
-    n_phi = (int) (pi*size*sin(pi*j/n_theta));
-    
-    for(i=0; i<n_phi; i++)
+    int i, j, k = 0;
+    double pi, angle;
+    int size = PVM_EncMatrix[0];
+    int n_phi = 0;
+    int n_theta = 0;
+
+    pi = M_PI;
+    angle = 2 * pi;
+    n_theta = (int)((pi * size) / (2 * ProUndersampling));
+
+    for (j = 0; j < n_theta; j++)
     {
-      r[i+k]=sin(pi*j/n_theta)*cos(angle*i/n_phi)*gr;
-      p[i+k]=sin(pi*j/n_theta)*sin(angle*i/n_phi)*gp;
-      s[i+k]=cos(pi*j/n_theta)*gs; 
+      n_phi = (int)(pi * size * sin(pi * j / n_theta));
+
+      for (i = 0; i < n_phi; i++)
+      {
+        r[i + k] = sin(pi * j / n_theta) * cos(angle * i / n_phi) * gr;
+        p[i + k] = sin(pi * j / n_theta) * sin(angle * i / n_phi) * gp;
+        s[i + k] = cos(pi * j / n_theta) * gs;
+      }
+      k += i;
     }
-    k += i;
+    return 0;
   }
+
+  /* GA modes: Kronecker / LinZ_GA */
+  const long N = (long)GA_NSpokesEff;
+
+  /* Optional gradient-friendly ordering:
+     - If GA_GradFriendly exists and is Yes, traverse near-neighbors on the sphere
+       using banded (in z) + azimuth sort with serpentine band order.
+     - If param is absent or No, fall back to simple i=0..N-1 order. */
+  int gradFriendly = 0;
+  if (ParxRelsParHasValue("GA_GradFriendly"))
+    gradFriendly = (GA_GradFriendly == Yes);
+
+  long *ord = NULL;
+
+  if (gradFriendly && N > 2)
+  {
+    const int nb = (int)floor(sqrt((double)N));
+    const int nBands = nb > 1 ? nb : 1;
+
+    /* Precompute z, az for each i (using same generator to place into bands) */
+    double *zz = (double*)malloc(sizeof(double)*N);
+    double *az = (double*)malloc(sizeof(double)*N);
+    if (!zz || !az) { if (zz) free(zz); if (az) free(az); gradFriendly = 0; }
+    else {
+      for (long i = 0; i < N; ++i)
+      {
+        double dx, dy, dz;
+        if (strcmp(GA_Mode, "Kronecker") == 0)
+          kronecker_dir(i, N, &dx, &dy, &dz);
+        else
+          linZ_ga_dir(i, N, &dx, &dy, &dz);
+        zz[i] = dz;
+        az[i] = atan2(dy, dx);
+      }
+
+      /* Count per-band by z */
+      long *band_counts = (long*)calloc(nBands, sizeof(long));
+      long *band_offsets = (long*)malloc(sizeof(long)*nBands);
+      long *tmp = (long*)malloc(sizeof(long)*N);
+      ord = (long*)malloc(sizeof(long)*N);
+
+      if (!band_counts || !band_offsets || !tmp || !ord)
+      {
+        gradFriendly = 0;
+        if (band_counts) free(band_counts);
+        if (band_offsets) free(band_offsets);
+        if (tmp) free(tmp);
+        if (ord) { free(ord); ord = NULL; }
+      }
+      else
+      {
+        for (long i = 0; i < N; ++i)
+        {
+          int b = (int)floor( ((zz[i] + 1.0) * 0.5) * nBands );
+          if (b < 0) b = 0; if (b >= nBands) b = nBands - 1;
+          band_counts[b]++;
+        }
+
+        band_offsets[0] = 0;
+        for (int b = 1; b < nBands; ++b)
+          band_offsets[b] = band_offsets[b-1] + band_counts[b-1];
+
+        /* Bucket indices to bands */
+        memset(band_counts, 0, sizeof(long)*nBands);
+        for (long i = 0; i < N; ++i)
+        {
+          int b = (int)floor( ((zz[i] + 1.0) * 0.5) * nBands );
+          if (b < 0) b = 0; if (b >= nBands) b = nBands - 1;
+          long dst = band_offsets[b] + band_counts[b]++;
+          tmp[dst] = i;
+        }
+
+        /* Sort each band by azimuth (insertion sort is fine for small bands) and serpentine traverse */
+        long pos = 0;
+        for (int b = 0; b < nBands; ++b)
+        {
+          long start = band_offsets[b];
+          long count = band_counts[b];
+
+          for (long u = 1; u < count; ++u)
+          {
+            long idx = tmp[start + u];
+            double key = az[idx];
+            long v = u - 1;
+            while (v >= 0 && az[tmp[start + v]] > key) { tmp[start + v + 1] = tmp[start + v]; v--; }
+            tmp[start + v + 1] = idx;
+          }
+
+          if ((b & 1) == 0) {
+            for (long u = 0; u < count; ++u) ord[pos++] = tmp[start + u];
+          } else {
+            for (long u = count; u-- > 0; )   ord[pos++] = tmp[start + u];
+          }
+        }
+
+        free(tmp);
+        free(band_offsets);
+        free(band_counts);
+      }
+
+      free(zz);
+      free(az);
+    }
+  }
+
+  /* Fill outputs in chosen order (direct or gradient-friendly) */
+  if (!gradFriendly || !ord)
+  {
+    for (long i = 0; i < N; ++i)
+    {
+      double dx, dy, dz;
+      if (strcmp(GA_Mode, "Kronecker") == 0)
+        kronecker_dir(i, N, &dx, &dy, &dz);
+      else
+        linZ_ga_dir(i, N, &dx, &dy, &dz);
+
+      r[i] = dx * gr;
+      p[i] = dy * gp;
+      s[i] = dz * gs;
+    }
+  }
+  else
+  {
+    for (long k = 0; k < N; ++k)
+    {
+      long i = ord[k];
+      double dx, dy, dz;
+      if (strcmp(GA_Mode, "Kronecker") == 0)
+        kronecker_dir(i, N, &dx, &dy, &dz);
+      else
+        linZ_ga_dir(i, N, &dx, &dy, &dz);
+
+      r[k] = dx * gr;
+      p[k] = dy * gp;
+      s[k] = dz * gs;
+    }
+    free(ord);
+  }
+
   return 0;
 }
+
 
 
 void UpdateAdjustments(void)

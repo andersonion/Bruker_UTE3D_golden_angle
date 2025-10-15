@@ -148,6 +148,57 @@ double parameter
 
 double parameter SpoilDur;
 
+/* ================================================================
+   ---- Trajectory Selection ----
+   ================================================================ */
+
+enum parameter
+{
+  display_name "Trajectory Mode";
+  short_description "Select projection ordering: packaged UTE3D, Kronecker (recommended), or linear-in-z golden angle.";
+  relations backbone;
+  enums  = { "UTE3D", "Kronecker", "LinZ_GA" };
+  formats= { "%s",    "%s",        "%s"      };
+} GA_Mode = "Kronecker";   // default strongly recommended
+
+YesNo parameter
+{
+  display_name "Force Fibonacci Spoke Count";
+  short_description "Round requested spokes up to the nearest Fibonacci number.";
+  relations backbone;
+} GA_UseFibonacci;
+
+int parameter
+{
+  display_name "Requested Number of Spokes";
+  short_description "Total number of projection spokes (all frames combined).";
+  units "spokes";
+  format "%d";
+  minimum 1;
+  maximum 100000000;
+  relations backbone;
+} GA_NSpokesReq = 10000;
+
+int parameter
+{
+  display_name "Effective Number of Spokes";
+  short_description "Derived spokes after applying Fibonacci constraint.";
+  units "spokes";
+  format "%d";
+  minimum 1;
+  maximum 100000000;
+  relations backbone;
+} GA_NSpokesEff = 10000;
+
+
+YesNo parameter
+{
+  display_name "Gradient-Friendly Order";
+  short_description "Traverse directions in a near-neighbor order to reduce gradient jumps (minimize slew/eddy).";
+  relations backbone;
+} GA_GradFriendly = No;
+
+
 /****************************************************************/
 /*	E N D   O F   F I L E					*/
 /****************************************************************/
