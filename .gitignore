@@ -1,0 +1,135 @@
+# ----------------------------------------------------------
+# General build artifacts
+# ----------------------------------------------------------
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+*.out
+*.app
+*.bin
+*.mod
+*.pch
+
+# Intermediate build folders
+build/
+Build/
+bin/
+lib/
+dist/
+Release/
+Debug/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+*.ninja
+*.ilk
+*.pdb
+*.manifest
+
+# ----------------------------------------------------------
+# Compiled Python / MATLAB / Perl
+# ----------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.mex*
+*.pmc
+
+# ----------------------------------------------------------
+# Logs / temporary / runtime files
+# ----------------------------------------------------------
+*.log
+*.tmp
+*.swp
+*.bak
+*.old
+*.save
+*.pid
+*.lock
+core
+core.*
+*.dSYM/
+*.stackdump
+
+# ----------------------------------------------------------
+# Editors / OS metadata
+# ----------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.lnk
+*.sublime-project
+*.sublime-workspace
+.vscode/
+.idea/
+
+# ----------------------------------------------------------
+# Virtual environments & containers
+# ----------------------------------------------------------
+.venv/
+env/
+ENV/
+*.env
+*.envrc
+*.singularity.sif
+*.sif
+*.simg
+*.sif.gz
+*.def
+*.sandbox/
+*.apptainer/
+*.conda/
+*.cache/
+*.mri-recon/
+*.egg-info/
+
+# ----------------------------------------------------------
+# HPC / cluster junk
+# ----------------------------------------------------------
+slurm-*.out
+nohup.out
+*.job
+*.pbs
+*.sbatch
+*.log.*
+*.stderr
+*.stdout
+
+# ----------------------------------------------------------
+# Data / images / results
+# ----------------------------------------------------------
+*.nii
+*.nii.gz
+*.mat
+*.h5
+*.csv
+*.tsv
+*.json
+*.yaml
+*.yml
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+results/
+output/
+tmp/
+scratch/
+*.dat
+*.bin
+
+# ----------------------------------------------------------
+# Git / system sanity
+# ----------------------------------------------------------
+*.orig
+*.rej
+*.diff
+*.patch
+*.merge_file

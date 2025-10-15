@@ -1,0 +1,111 @@
+;===============================================================
+;=
+;= $Source: /pv/CvsTree/pv/gen/src/prg/methods/UTE3D/golden_angle_UTE3D.ppg,v $
+;=
+;= A 3D radial imaging pulse program
+;=
+;= $Id: golden_angle_UTE3D.ppg,v 1.20 2013/07/05 14:11:47 sako Exp $
+;===============================================================
+
+  preset off
+
+#include <MRI.include>
+
+define list<grad_shape> Shape={$GradShape}
+
+;============================================================
+#include <TrajectoryDef.mod>
+
+if (PVM_TrajAdjustmentRunning == Yes)
+{ 
+  subr trajPerform()
+}
+else
+{
+
+
+define list<grad_scalar> ProjR={$GradAmpR}
+define list<grad_scalar> ProjP={$GradAmpP}
+define list<grad_scalar> ProjS={$GradAmpS}
+
+
+;===========================================================
+;   declaration of loops
+;===========================================================
+
+grad_zero_for_gs <ProjR,ProjP,ProjS>
+
+ProjR.res
+ProjP.res
+ProjS.res
+
+define loopcounter projs = {$NPro}
+"l3 = projs + l11"
+
+#include <PrepModulesHead.mod> 
+
+INIT_DEVICES
+
+if(DS>0)
+{
+  dsl, 
+  0u	ProjR.dec
+  0u	ProjP.dec
+  0u    ProjS.dec
+  5u
+  lo to dsl times l11
+}
+
+
+;===============================================================================
+;	D/P               spec control          gradients	         
+;===============================================================================
+        10u recph ph1
+start, 	10u 
+	20u reload B0              
+subr TriggerPhase()
+if (GradSync == Yes)
+{
+	1u	GRAD_SYNC
+}
+;----------------------------------preparation modules -------------
+subr FovSat()
+subr MagTrans()
+subr FatSup()        
+;----------------------------------slice selection------------------
+        d2 	 fq1:f1      gatepulse 1
+        (p0:sp0 ph1):f1
+        d3
+        ADC_INIT_B(NOPH, ph0)
+if(ACQ_scan_type == Setup_Experiment)
+{
+        d4      ADC_START
+}
+else
+{
+        d4      ADC_START     grad_shape{ReadGrad*Shape()*ProjR, PhaseGrad*Shape()*ProjP, -SliceGrad*Shape()*ProjS}           
+}
+        d1      grad_off     
+        d0      ADC_END                         	                
+;----------------------------------projection loop-----------------
+	1u                                      ProjR.inc
+        1u					ProjP.inc
+        1u                                      ProjS.inc
+lo to start times l3
+   "l3=projs"
+	1u                                      ProjR.res
+	1u                                      ProjP.res
+        1u                                      ProjS.res
+lo to start times NAE
+        1u
+lo to start times NR
+SETUP_GOTO(start) 
+exit
+}
+
+;============================================================
+;phase lists
+
+ph0 = 0
+ph1 = 0 
+;============================================================
