@@ -394,12 +394,12 @@ void SetNPro(void)
     }
 
     CalcNPro(); 
-  /* --- override NPro if using GA modes --- */
-  if (strcmp(GA_Mode, "UTE3D") != 0)
-  {
-    NPro = GA_NSpokesEff;
-    DB_MSG(("GA mode active (%s): NPro overridden to %d", GA_Mode, NPro));
-  }
+	/* --- override NPro if using GA modes --- */
+	if (GA_Mode != GA_Traj_UTE3D) {
+	  NPro = GA_NSpokesEff;
+	  DB_MSG(("GA mode active (%d): NPro overridden to %d", (int)GA_Mode, NPro));
+	}
+
 	
     DB_MSG(("ProUnderSampling = %.4f, NPro = %d", ProUndersampling, NPro));
   }
@@ -414,32 +414,55 @@ int SetProj3D( double *r,
                const double gs)
 {
   /* packaged UTE3D: keep vendor spherical grid */
-  if (strcmp(GA_Mode, "UTE3D") == 0)
-  {
-    int i, j, k = 0;
-    double pi, angle;
-    int size = PVM_EncMatrix[0];
-    int n_phi = 0;
-    int n_theta = 0;
+/* packaged UTE3D: keep vendor spherical grid */
+	if (GA_Mode == GA_Traj_UTE3D)
+	{
+	  int i, j, k = 0;
+	  double pi, angle;
+	  int size = PVM_EncMatrix[0];
+	  int n_phi = 0;
+	  int n_theta = 0;
+	
+	  pi = M_PI;
+	  angle = 2 * pi;
+	  n_theta = (int)((pi * size) / (2 * ProUndersampling));
+	
+	  for (j = 0; j < n_theta; j++)
+	  {
+		n_phi = (int)(pi * size * sin(pi * j / n_theta));
+	
+		for (i = 0; i < n_phi; i++)
+		{
+		  r[i + k] = sin(pi * j / n_theta) * cos(angle * i / n_phi) * gr;
+		  p[i + k] = sin(pi * j / n_theta) * sin(angle * i / n_phi) * gp;
+		  s[i + k] = cos(pi * j / n_theta) * gs;
+		}
+		k += i;
+	  }
+	  return 0;
+	}
+	else
+	{
+	  /* Kronecker and LinZ_GA both use GA_NSpokesEff points */
+	  const long N = (long)GA_NSpokesEff;
+	
+	  for (long i = 0; i < N; ++i)
+	  {
+		double dx, dy, dz;
+	
+		if (GA_Mode == GA_Traj_Kronecker)
+		  kronecker_dir(i, N, &dx, &dy, &dz);
+		else  /* GA_Traj_LinZ_GA */
+		  linZ_ga_dir(i, N, &dx, &dy, &dz);
+	
+		/* scale by requested per-axis gradient magnitudes (gr,gp,gs) */
+		r[i] = dx * gr;
+		p[i] = dy * gp;
+		s[i] = dz * gs;
+	  }
+	  return 0;
+	}
 
-    pi = M_PI;
-    angle = 2 * pi;
-    n_theta = (int)((pi * size) / (2 * ProUndersampling));
-
-    for (j = 0; j < n_theta; j++)
-    {
-      n_phi = (int)(pi * size * sin(pi * j / n_theta));
-
-      for (i = 0; i < n_phi; i++)
-      {
-        r[i + k] = sin(pi * j / n_theta) * cos(angle * i / n_phi) * gr;
-        p[i + k] = sin(pi * j / n_theta) * sin(angle * i / n_phi) * gp;
-        s[i + k] = cos(pi * j / n_theta) * gs;
-      }
-      k += i;
-    }
-    return 0;
-  }
 
   /* GA modes: Kronecker / LinZ_GA */
   const long N = (long)GA_NSpokesEff;

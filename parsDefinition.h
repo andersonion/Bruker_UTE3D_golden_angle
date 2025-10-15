@@ -152,20 +152,20 @@ double parameter SpoilDur;
    ---- Trajectory Selection ----
    ================================================================ */
 
-enum parameter
+/* GA_Mode is now a typed enum parameter (see parsTypes.h) */
+GA_TrajMode parameter
 {
   display_name "Trajectory Mode";
   short_description "Select projection ordering: packaged UTE3D, Kronecker (recommended), or linear-in-z golden angle.";
   relations backbone;
-  enums  = { "UTE3D", "Kronecker", "LinZ_GA" };
-  formats= { "%s",    "%s",        "%s"      };
-} GA_Mode = "Kronecker";   // default strongly recommended
+} GA_Mode = GA_Traj_Kronecker;   /* default */
+
 
 YesNo parameter
 {
   display_name "Force Fibonacci Spoke Count";
   short_description "Round requested spokes up to the nearest Fibonacci number.";
-  relations backbone;
+  relations GA_UpdateSpokesRel;
 } GA_UseFibonacci;
 
 int parameter
@@ -176,7 +176,7 @@ int parameter
   format "%d";
   minimum 1;
   maximum 100000000;
-  relations backbone;
+  relations GA_UpdateSpokesRel;
 } GA_NSpokesReq = 10000;
 
 int parameter
