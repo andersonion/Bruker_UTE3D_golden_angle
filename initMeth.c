@@ -24,18 +24,46 @@ static const char resid[] = "$Id: initMeth.c,v 1.31 2013/05/22 10:55:23 sako Exp
 
 #include "method.h"
 /* ---- local GA helpers (initMeth.c) ---- */
-static int fib_by_index(int k)
-{
+static int fib_by_index(int k){
   if (k <= 1) return 1;
-  int a = 1, b = 1;
-  for (int i = 2; i <= k; ++i) { int t = a + b; a = b; b = t; }
+  int a=1,b=1; for (int i=2;i<=k;++i){ int t=a+b; a=b; b=t; }
   return b;
 }
+
 
 
 void initMeth()
 /*:=MPE=:=======================================================*/
 {
+
+	/* ---- GA defaults: apply once per study, then never touch again ---- */
+	if (GA_DefaultsApplied != Yes) {
+	  /* YOUR two requested defaults */
+	  GA_Mode          = GA_Traj_Kronecker;   /* default mode */
+	  GA_UseFibonacci  = Yes;                 /* default: ON */
+	
+	  /* sensible seeds for the rest (only if unset/bad) */
+	  if (GA_NSpokesReq < 1) GA_NSpokesReq = 10000;
+	  if (GA_FibIndex   < 2 || GA_FibIndex > 45) GA_FibIndex = 19;  /* F(19)=4181 */
+	  if (GA_FibValue   < 0) GA_FibValue = 0;
+	
+	  GA_DefaultsApplied = Yes;               /* lock in so we don’t re-default */
+	}
+
+	/* ---- GA derive (runs every time; does not overwrite inputs) ---- */
+	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
+	if (GA_FibIndex   < 2) GA_FibIndex   = 2;
+	
+	if (GA_UseFibonacci == Yes) {
+	  GA_FibValue   = fib_by_index(GA_FibIndex);  /* make sure fib_by_index is defined above */
+	  GA_NSpokesEff = GA_FibValue;
+	} else {
+	  GA_FibValue   = 0;
+	  GA_NSpokesEff = GA_NSpokesReq;
+	}
+
+
+
   int dimRange[2]   = {3, 3};
   int lowMat[3]     = {16, 16, 16};
   int upMat[3]      = {512, 512, 512};
@@ -89,43 +117,6 @@ void initMeth()
   ParxRelsMakeNonEditable("NPro");
   ProUnderRange();
   ReadGradLim = 100.0;
-
-	/* ---- GA one-time defaults gated by a persistent flag ---- */
-	if (GA_DefaultsApplied != Yes) {
-	  /* clamp or set sane defaults ONLY the first time */
-	  if (GA_Mode < GA_Traj_UTE3D || GA_Mode > GA_Traj_LinZ_GA)
-		GA_Mode = GA_Traj_Kronecker;
-	
-	  if (GA_UseFibonacci != Yes && GA_UseFibonacci != No)
-		GA_UseFibonacci = No;
-	
-	  if (GA_NSpokesReq < 1)
-		GA_NSpokesReq = 10000;
-	
-	  if (GA_FibIndex < 2 || GA_FibIndex > 45)
-		GA_FibIndex = 19;   /* F(19)=4181 */
-	
-	  if (GA_FibValue < 0) /* derived, harmless to reset */
-		GA_FibValue = 0;
-	
-	  GA_DefaultsApplied = Yes;   /* <-- this is what makes it stick */
-	}
-
-	/* ---- GA: sanitize user inputs and derive dependents (no defaults here) ---- */
-	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
-	if (GA_FibIndex   < 2) GA_FibIndex   = 2;
-	
-	if (GA_UseFibonacci == Yes) {
-	  GA_FibValue   = fib_by_index(GA_FibIndex);
-	  GA_NSpokesEff = GA_FibValue;
-	} else {
-	  GA_FibValue   = 0;                /* cosmetic */
-	  GA_NSpokesEff = GA_NSpokesReq;
-	}
-	
-	DB_MSG(("initMeth: Mode=%d, UseFib=%d, NReq=%d, k=%d, Fk=%d, NEff=%d",
-			(int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff));
-	
 
   if(ParxRelsParHasValue("YesNoMinEchoTime") == 0)
     YesNoMinEchoTime = Yes;
