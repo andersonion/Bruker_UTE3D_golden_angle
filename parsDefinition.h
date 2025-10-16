@@ -221,11 +221,11 @@ int parameter
   relations backbone;     /* read-only display; computed in relations/init */
 } GA_FibValue;
 
-/* ---- Internal: one-time defaults flag (persists) ---- */
+/* ---- Internal: one-time GA defaults applied? (persistent) ---- */
 YesNo parameter
 {
   display_name "GA Defaults Applied (internal)";
-  short_description "Internal flag to ensure GA defaults are applied only once.";
+  short_description "Internal flag so defaults run only once per protocol.";
   relations backbone;
 } GA_DefaultsApplied;
 

@@ -26,23 +26,31 @@ void loadMeth(const char *className)
 {
   (void)className;
 
-  /* ---- One-time GA defaults: only when PV has no stored value yet ---- */
-  if (ParxRelsParHasValue("GA_Mode")         == No) GA_Mode         = GA_Traj_Kronecker;  /* default */
-  if (ParxRelsParHasValue("GA_UseFibonacci") == No) GA_UseFibonacci = Yes;                /* default ON */
-  if (ParxRelsParHasValue("GA_NSpokesReq")   == No) GA_NSpokesReq   = 10000;
-  if (ParxRelsParHasValue("GA_FibIndex")     == No) GA_FibIndex     = 19;                 /* F(19)=4181 */
-  if (ParxRelsParHasValue("GA_FibValue")     == No) GA_FibValue     = 0;                  /* derived */
+  /* ---- Apply our two defaults once per protocol ---- */
+  if (ParxRelsParHasValue("GA_DefaultsApplied") == No || GA_DefaultsApplied != Yes) {
+    GA_Mode          = GA_Traj_Kronecker;   /* default */
+    GA_UseFibonacci  = Yes;                 /* default ON */
 
-  /* Derive dependents once so the editor shows consistent values on first open */
+    /* seed other knobs sensibly only if unset */
+    if (ParxRelsParHasValue("GA_NSpokesReq") == No || GA_NSpokesReq < 1) GA_NSpokesReq = 10000;
+    if (ParxRelsParHasValue("GA_FibIndex")   == No || GA_FibIndex   < 2 || GA_FibIndex > 45) GA_FibIndex = 19;
+    if (ParxRelsParHasValue("GA_FibValue")   == No) GA_FibValue = 0;
+
+    GA_DefaultsApplied = Yes;               /* <-- persists with the protocol */
+  }
+
+  /* Derive dependents so the editor shows correct values */
   GA_UpdateSpokesRel();
 
-  /* Nudge widgets to show *stored* values when the card is (re)opened */
+  /* Mirror current stored values back to widgets so the card displays them */
   GA_Mode         = GA_Mode;
   GA_UseFibonacci = GA_UseFibonacci;
   GA_FibIndex     = GA_FibIndex;
   GA_NSpokesReq   = GA_NSpokesReq;
 
-  backbone();  /* ensure any dependent arrays are up-to-date in the UI */
+  backbone();
+}
+);  /* ensure any dependent arrays are up-to-date in the UI */
 }
 
 /* ***************************************************************/
