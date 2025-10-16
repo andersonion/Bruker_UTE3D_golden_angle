@@ -90,7 +90,7 @@ void initMeth()
   ProUnderRange();
   ReadGradLim = 100.0;
 
-	/* sanitize ranges, but don’t change user intent */
+	/* ---- GA: sanitize user inputs and derive dependents (no defaults here) ---- */
 	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
 	if (GA_FibIndex   < 2) GA_FibIndex   = 2;
 	
@@ -98,9 +98,13 @@ void initMeth()
 	  GA_FibValue   = fib_by_index(GA_FibIndex);
 	  GA_NSpokesEff = GA_FibValue;
 	} else {
-	  GA_FibValue   = 0;                /* cosmetic only */
+	  GA_FibValue   = 0;                /* cosmetic */
 	  GA_NSpokesEff = GA_NSpokesReq;
 	}
+	
+	DB_MSG(("initMeth: Mode=%d, UseFib=%d, NReq=%d, k=%d, Fk=%d, NEff=%d",
+			(int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff));
+	
 
   if(ParxRelsParHasValue("YesNoMinEchoTime") == 0)
     YesNoMinEchoTime = Yes;

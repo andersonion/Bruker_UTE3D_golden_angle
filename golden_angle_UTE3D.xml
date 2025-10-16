@@ -112,8 +112,6 @@ Description: Layout of routine parameter editor for method UTE3D.
                 <parameter name="GA_FibIndex"     displayName="Fibonacci Index (k)"/>
 				<parameter name="GA_NSpokesEff" displayName="Effective Number of Spokes"/>
 				<parameter name="GA_FibValue"   displayName="Fibonacci Value F(k)" />
-				<textLine text="Effective Spokes: ${GA_NSpokesEff}"/>
-				<textLine text="Fibonacci Value F(k): ${GA_FibValue}"/>
                 <parameter name="GA_NSpokesReq"     displayName="Requested Number of Spokes"/>
             </column>
         </parameterCard>

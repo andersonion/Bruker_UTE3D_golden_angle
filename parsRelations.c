@@ -349,8 +349,12 @@ void GA_UpdateSpokesRel(void)
         GA_NSpokesEff = GA_NSpokesReq;
     }
 
-    backbone();   /* refresh sizes & projection tables */
+    DB_MSG(("GA_UpdateSpokesRel: UseFib=%d, NReq=%d, k=%d -> Fk=%d, NEff=%d",
+            (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff));
+
+    backbone();
 }
+
 
 
 
