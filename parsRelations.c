@@ -342,7 +342,7 @@ void GA_UpdateSpokesRel(void)
     if (GA_FibIndex   < 2) GA_FibIndex   = 2;
 
     if (GA_UseFibonacci == Yes) {
-        GA_FibValue   = fib_by_index(GA_FibIndex);
+        GA_FibValue   = fib_by_index(GA_FibIndex);  /* include same helper or a prototype */
         GA_NSpokesEff = GA_FibValue;
     } else {
         GA_FibValue   = 0;
@@ -351,6 +351,7 @@ void GA_UpdateSpokesRel(void)
 
     backbone();
 }
+
 
 
 

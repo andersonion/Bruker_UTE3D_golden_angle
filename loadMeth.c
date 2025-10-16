@@ -24,19 +24,26 @@ static const char resid[] = "$Id: loadMeth.c,v 1.3 2011/05/04 10:54:35 wemch Exp
 
 void loadMeth(const char *className)
 {
-	(void)className;
+  (void)className;
 
-  /* One-time defaults (persist). Only set if PV has no stored value. */
-  if (ParxRelsParHasValue("GA_Mode")         == No) GA_Mode         = GA_Traj_Kronecker;
-  if (ParxRelsParHasValue("GA_UseFibonacci") == No) GA_UseFibonacci = Yes;   /* default ON */
+  /* ---- One-time GA defaults: only when PV has no stored value yet ---- */
+  if (ParxRelsParHasValue("GA_Mode")         == No) GA_Mode         = GA_Traj_Kronecker;  /* default */
+  if (ParxRelsParHasValue("GA_UseFibonacci") == No) GA_UseFibonacci = Yes;                /* default ON */
   if (ParxRelsParHasValue("GA_NSpokesReq")   == No) GA_NSpokesReq   = 10000;
-  if (ParxRelsParHasValue("GA_FibIndex")     == No) GA_FibIndex     = 17;    /* F(19)=4181 */
-  if (ParxRelsParHasValue("GA_FibValue")     == No) GA_FibValue     = 0;
+  if (ParxRelsParHasValue("GA_FibIndex")     == No) GA_FibIndex     = 19;                 /* F(19)=4181 */
+  if (ParxRelsParHasValue("GA_FibValue")     == No) GA_FibValue     = 0;                  /* derived */
 
-  /* derive once so initial open shows consistent values */
+  /* Derive dependents once so the editor shows consistent values on first open */
   GA_UpdateSpokesRel();
-}
 
+  /* Nudge widgets to show *stored* values when the card is (re)opened */
+  GA_Mode         = GA_Mode;
+  GA_UseFibonacci = GA_UseFibonacci;
+  GA_FibIndex     = GA_FibIndex;
+  GA_NSpokesReq   = GA_NSpokesReq;
+
+  backbone();  /* ensure any dependent arrays are up-to-date in the UI */
+}
 
 /* ***************************************************************/
 /*		E N D   O F   F I L E				 */
