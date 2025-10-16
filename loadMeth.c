@@ -40,7 +40,7 @@ void loadMeth(const char *className)
       GA_NSpokesReq = 10000;
 
     //if (ParxRelsParHasValue("GA_FibIndex") == No || GA_FibIndex < 2 || GA_FibIndex > 45)
-      GA_FibIndex = 19;  /* F(19)=4181 */
+      GA_FibIndex = 17;  /* F(19)=4181 */
 
     //if (ParxRelsParHasValue("GA_FibValue") == No)
       GA_FibValue = 0;   /* derived */
