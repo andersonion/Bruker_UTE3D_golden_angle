@@ -19,23 +19,27 @@ static const char resid[] = "$Id: loadMeth.c,v 1.3 2011/05/04 10:54:35 wemch Exp
 #define DB_MODULE	0
 #define DB_LINE_NR	0
 
-
+#include "relProtos.h"
 #include "method.h"
 
 
 void loadMeth(const char *className)
 {
   DB_MSG(( "-->UTE3D:loadMeth( %s )", className ));
-/* ---- GA one-time defaults (persist across sessions) ---- */
-if (!ParxRelsParHasValue("GA_Mode"))         GA_Mode         = GA_Traj_Kronecker;
-if (!ParxRelsParHasValue("GA_UseFibonacci")) GA_UseFibonacci = No;
-if (!ParxRelsParHasValue("GA_NSpokesReq"))   GA_NSpokesReq   = 10000;
-if (!ParxRelsParHasValue("GA_FibIndex"))     GA_FibIndex     = 19;   /* F(19)=4181 */
-if (!ParxRelsParHasValue("GA_FibValue"))     GA_FibValue     = 0;
-/* Optional: default for the ordering toggle if you added it */
-if (ParxRelsParHasValue("GA_GradFriendly") == No) {
-    /* nothing — leave untouched if you didn’t declare it */
-}
+/* ---- GA one-time defaults (persist across sessions) ----
+   IMPORTANT: ParxRelsParHasValue returns Yes/No, so test '== No'
+*/
+if (ParxRelsParHasValue("GA_Mode")         == No) GA_Mode         = GA_Traj_Kronecker;
+if (ParxRelsParHasValue("GA_UseFibonacci") == No) GA_UseFibonacci = No;
+if (ParxRelsParHasValue("GA_NSpokesReq")   == No) GA_NSpokesReq   = 10000;
+if (ParxRelsParHasValue("GA_FibIndex")     == No) GA_FibIndex     = 19;   /* default F(19)=4181 */
+if (ParxRelsParHasValue("GA_FibValue")     == No) GA_FibValue     = 0;
+
+/* Optionally derive once so the UI looks right on first open */
+#ifdef GA_UpdateSpokesRel
+GA_UpdateSpokesRel();   /* requires relProtos.h; otherwise omit and let InitMeth derive */
+#endif
+
 
 
   if (0 != className)
