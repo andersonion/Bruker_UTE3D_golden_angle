@@ -22,6 +22,14 @@ static const char resid[] = "$Id: parsRelations.c,v 1.20 2013/06/14 14:02:41 sak
 
 #include "method.h"
 
+/* local helper for GA relations */
+static int fib_closest_ge(int n)
+{
+  if (n <= 1) return 1;
+  int a = 1, b = 1;
+  while (b < n) { int t = a + b; a = b; b = t; }
+  return b;
+}
 
 
 /*-----------------------------------------------
@@ -324,4 +332,6 @@ void GA_UpdateSpokesRel(void)
     GA_NSpokesEff = (GA_UseFibonacci == Yes)
                       ? fib_closest_ge(GA_NSpokesReq)
                       : GA_NSpokesReq;
+    backbone();
 }
+

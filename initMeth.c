@@ -91,7 +91,10 @@ void initMeth()
 
 	/* ---- GA defaults (moved from parsDefinition.h) ---- */
 	if (!ParxRelsParHasValue("GA_Mode"))          GA_Mode = GA_Traj_Kronecker;
+	/* Optional toggle; if you created GA_GradFriendly parameter */
+	#ifdef GA_GradFriendly
 	if (!ParxRelsParHasValue("GA_GradFriendly"))  GA_GradFriendly = No;
+	#endif
 	if (!ParxRelsParHasValue("GA_UseFibonacci"))  GA_UseFibonacci = No;
 	if (!ParxRelsParHasValue("GA_NSpokesReq"))    GA_NSpokesReq = 10000;
 	
@@ -100,8 +103,6 @@ void initMeth()
 	GA_NSpokesEff = (GA_UseFibonacci == Yes)
 					  ? fib_closest_ge(GA_NSpokesReq)
 					  : GA_NSpokesReq;
-
-
 
   if(ParxRelsParHasValue("YesNoMinEchoTime") == 0)
     YesNoMinEchoTime = Yes;
