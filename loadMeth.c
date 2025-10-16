@@ -45,17 +45,14 @@ void loadMeth(const char *className)
     if (ParxRelsParHasValue("GA_FibValue") == No)
       GA_FibValue = 0;   /* derived */
 
-
+	GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
   }
 
   /* derive dependents so the editor shows consistent values */
   GA_UpdateSpokesRel();
 
 
-    GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
-      DB_MSG(("loadMeth: EXIT   Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
-          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
-
+    
 
 
   /* mirror stored values back into widgets so the card displays them on revisit */
@@ -66,7 +63,7 @@ void loadMeth(const char *className)
 
   /* ensure dependent arrays/tables are refreshed */
   backbone();
-      GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
+
       DB_MSG(("loadMeth: EXIT   Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
           (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
 
