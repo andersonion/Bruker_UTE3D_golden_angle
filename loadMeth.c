@@ -15,9 +15,9 @@
 
 static const char resid[] = "$Id: loadMeth.c,v 1.3 2011/05/04 10:54:35 wemch Exp $ (C) 2009-2010 Bruker BioSpin MRI GmbH";
 
-#define DEBUG		0
-#define DB_MODULE	0
-#define DB_LINE_NR	0
+#define DEBUG		1
+#define DB_MODULE	1
+#define DB_LINE_NR	1
 /* loadMeth.c — golden_angle_UTE3D */
 
 #include "method.h"
@@ -26,6 +26,8 @@ static const char resid[] = "$Id: loadMeth.c,v 1.3 2011/05/04 10:54:35 wemch Exp
 void loadMeth(const char *className)
 {
   (void)className;
+  DB_MSG(("loadMeth: ENTER  Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
+          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
 
   /* ---- Apply our two defaults once per protocol ---- */
   if (ParxRelsParHasValue("GA_DefaultsApplied") == No || GA_DefaultsApplied != Yes) {
@@ -43,11 +45,18 @@ void loadMeth(const char *className)
     if (ParxRelsParHasValue("GA_FibValue") == No)
       GA_FibValue = 0;   /* derived */
 
-    GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
+
   }
 
   /* derive dependents so the editor shows consistent values */
   GA_UpdateSpokesRel();
+
+
+    GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
+      DB_MSG(("loadMeth: EXIT   Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
+          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
+
+
 
   /* mirror stored values back into widgets so the card displays them on revisit */
   GA_Mode         = GA_Mode;
@@ -57,4 +66,8 @@ void loadMeth(const char *className)
 
   /* ensure dependent arrays/tables are refreshed */
   backbone();
+      GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
+      DB_MSG(("loadMeth: EXIT   Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
+          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
+
 }
