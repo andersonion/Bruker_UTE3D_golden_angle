@@ -1,39 +1,43 @@
+/* loadMeth.c — golden_angle_UTE3D */
+
 #include "method.h"
 #include "relProtos.h"
 #include <string.h>
 
 void loadMeth(const char *className)
 {
-  /* Only act for the method editor; do nothing for pdata/reco editors. */
-  if (!className || strcmp(className, "MethodClass") != 0) {
-    DB_MSG(("loadMeth: skip for class=%s", className ? className : "(null)"));
-    return;
-  }
+  /* Log the class for visibility, but DO NOT return early. */
+  DB_MSG(("loadMeth: class=%s", className ? className : "(null)"));
 
   DB_MSG(("loadMeth: ENTER  Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
-          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
+          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex,
+          GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
 
-  /* ---- ALWAYS hard-wire online recon OFF in the method editor ---- */
+  /* Always hard-wire online recon OFF in the method context */
   RecoOnline = No;
 
-  /* ---- Apply GA defaults exactly once on this node ---- */
+  /* ---- Apply defaults exactly once per node ---- */
   if (ParxRelsParHasValue("GA_DefaultsApplied") == No || GA_DefaultsApplied != Yes) {
-      /* Unconditional seeds for the two primary controls (do NOT guard these) */
-      GA_Mode         = GA_Traj_Kronecker;   /* default: Kronecker (recommended) */
-      GA_UseFibonacci = Yes;                 /* default: ON */
-
-      /* Sanity for the rest */
+      GA_Mode         = GA_Traj_Kronecker;   /* default trajectory */
+      GA_UseFibonacci = Yes;                 /* default ON */
       if (GA_NSpokesReq < 1)                   GA_NSpokesReq = 10000;
       if (GA_FibIndex   < 2 || GA_FibIndex>45) GA_FibIndex   = 19;   /* F(19)=4181 */
-      if (GA_FibValue   < 0)                   GA_FibValue   = 0;    /* derived placeholder */
-
-      GA_DefaultsApplied = Yes;  /* mark done so we never reseed this node again */
+      if (GA_FibValue   < 0)                   GA_FibValue   = 0;
+      GA_DefaultsApplied = Yes;               /* mark done; never reseed this node */
+      DB_MSG(("loadMeth: seeded defaults once"));
   }
 
-  /* Derive dependents (and keep everything coherent) */
+  /* ---- Self-heal: if a reopen shows type defaults, restore our intended defaults ---- */
+  if ((int)GA_Mode == 0 && (int)GA_UseFibonacci == 0) {
+      DB_MSG(("loadMeth: self-heal Mode/UseFib (saw type defaults 0/0)"));
+      GA_Mode         = GA_Traj_Kronecker;
+      GA_UseFibonacci = Yes;
+  }
+
+  /* Derive dependents */
   GA_UpdateSpokesRel();
 
-  /* Mirror stored values back into widgets so the card shows reality on reopen */
+  /* Mirror stored values back to widgets so the card shows reality on revisit */
   GA_Mode         = GA_Mode;
   GA_UseFibonacci = GA_UseFibonacci;
   GA_FibIndex     = GA_FibIndex;
@@ -41,10 +45,7 @@ void loadMeth(const char *className)
 
   backbone();
 
-  /* If you added GA_RefreshUI + GA_RefreshUIRel, you may keep this: */
-  /* GA_RefreshUI = (GA_RefreshUI == Yes) ? No : Yes; */
-  /* GA_RefreshUIRel(); */
-
   DB_MSG(("loadMeth: EXIT   Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
-          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
+          (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex,
+          GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
 }

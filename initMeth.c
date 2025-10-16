@@ -36,6 +36,7 @@ void initMeth()
 /*:=MPE=:=======================================================*/
 {
 
+	RecoOnline = No;
 
 	/* ---- GA derive (runs every time; does not overwrite inputs) ---- */
 	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
