@@ -165,6 +165,8 @@ void initMeth()
   
   backbone();
  
+DB_MSG(("initMeth: Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",
+        (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
 
   DB_MSG(( "<-- initMeth" ));
 

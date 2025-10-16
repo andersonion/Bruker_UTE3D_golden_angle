@@ -350,6 +350,9 @@ void GA_UpdateSpokesRel(void)
     }
 
     backbone();
+    DB_MSG(("GA_Update: Mode=%d  UseFib=%d  NReq=%d  k=%d  -> Fk=%d  NEff=%d",
+        (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff));
+
 }
 
 
