@@ -30,7 +30,10 @@ static int fib_prev2(int fk){ int p=fib_prev(fk); return fib_prev(p); }
 
 static inline void uv_to_dir(double u,double v,double *dx,double *dy,double *dz){
   double z=1.0-2.0*u;
-  double r=sqrt(MAX(0.0,1.0-z*z));
+  double r2 = 1.0 - z*z;
+  if (r2 < 0.0) r2 = 0.0;
+  double r = sqrt(r2);
+
   double az=2.0*M_PI*v;
   *dx=r*cos(az); *dy=r*sin(az); *dz=z;
 }
@@ -47,7 +50,10 @@ static void kronecker_dir(long i,long N,double *dx,double *dy,double *dz){
 static void linZ_ga_dir(long i,long N,double *dx,double *dy,double *dz){
   const double phi_inc=(sqrt(5.0)-1.0)*M_PI;
   double z=1.0-2.0*((i+0.5)/(double)N);
-  double r=sqrt(MAX(0.0,1.0-z*z));
+  double r2 = 1.0 - z*z;
+  if (r2 < 0.0) r2 = 0.0;
+  double r  = sqrt(r2);
+
   double az=fmod(i*phi_inc,2.0*M_PI);
   *dx=r*cos(az); *dy=r*sin(az); *dz=z;
 }
