@@ -23,12 +23,14 @@ static const char resid[] = "$Id: initMeth.c,v 1.31 2013/05/22 10:55:23 sako Exp
 
 
 #include "method.h"
-/* ---- Fibonacci helpers ---- */
-static int fib_closest_ge(int n){ if(n<=1) return 1; int a=1,b=1; while(b<n){int t=a+b;a=b;b=t;} return b; }
-static int fib_prev(int fk)     { /* return previous Fibonacci given fk */ 
-    if (fk<=1) return 1; int a=1,b=1; while(b<fk){int t=a+b;a=b;b=t;} return a;
+/* ---- local GA helpers (initMeth.c) ---- */
+static int fib_by_index(int k)
+{
+  if (k <= 1) return 1;
+  int a = 1, b = 1;
+  for (int i = 2; i <= k; ++i) { int t = a + b; a = b; b = t; }
+  return b;
 }
-
 
 
 void initMeth()
