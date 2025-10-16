@@ -90,6 +90,27 @@ void initMeth()
   ProUnderRange();
   ReadGradLim = 100.0;
 
+	/* ---- GA one-time defaults gated by a persistent flag ---- */
+	if (GA_DefaultsApplied != Yes) {
+	  /* clamp or set sane defaults ONLY the first time */
+	  if (GA_Mode < GA_Traj_UTE3D || GA_Mode > GA_Traj_LinZ_GA)
+		GA_Mode = GA_Traj_Kronecker;
+	
+	  if (GA_UseFibonacci != Yes && GA_UseFibonacci != No)
+		GA_UseFibonacci = No;
+	
+	  if (GA_NSpokesReq < 1)
+		GA_NSpokesReq = 10000;
+	
+	  if (GA_FibIndex < 2 || GA_FibIndex > 45)
+		GA_FibIndex = 19;   /* F(19)=4181 */
+	
+	  if (GA_FibValue < 0) /* derived, harmless to reset */
+		GA_FibValue = 0;
+	
+	  GA_DefaultsApplied = Yes;   /* <-- this is what makes it stick */
+	}
+
 	/* ---- GA: sanitize user inputs and derive dependents (no defaults here) ---- */
 	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
 	if (GA_FibIndex   < 2) GA_FibIndex   = 2;
