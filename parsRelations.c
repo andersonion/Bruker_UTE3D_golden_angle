@@ -349,8 +349,9 @@ void GA_UpdateSpokesRel(void)
         GA_NSpokesEff = GA_NSpokesReq;
     }
 
-    backbone();  /* re-size & rebuild projections */
+    backbone();
 }
+
 
 
 

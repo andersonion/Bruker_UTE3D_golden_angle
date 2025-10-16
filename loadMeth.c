@@ -22,14 +22,17 @@ static const char resid[] = "$Id: loadMeth.c,v 1.3 2011/05/04 10:54:35 wemch Exp
 #include "relProtos.h"
 #include "method.h"
 
-void loadMeth(const char *className)
+void loadMeth(void)
 {
-  (void)className;
-  /* no GA defaults here; defaults are handled once in initMeth via GA_DefaultsApplied */
-  /* Ensure derived values are up-to-date the first time the editor appears */
-	GA_UpdateSpokesRel();
-	backbone();
+  /* One-time defaults (persist). Only set if PV has no stored value. */
+  if (ParxRelsParHasValue("GA_Mode")         == No) GA_Mode         = GA_Traj_Kronecker;
+  if (ParxRelsParHasValue("GA_UseFibonacci") == No) GA_UseFibonacci = Yes;   /* default ON */
+  if (ParxRelsParHasValue("GA_NSpokesReq")   == No) GA_NSpokesReq   = 10000;
+  if (ParxRelsParHasValue("GA_FibIndex")     == No) GA_FibIndex     = 17;    /* F(19)=4181 */
+  if (ParxRelsParHasValue("GA_FibValue")     == No) GA_FibValue     = 0;
 
+  /* derive once so initial open shows consistent values */
+  GA_UpdateSpokesRel();
 }
 
 

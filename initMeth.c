@@ -36,19 +36,6 @@ void initMeth()
 /*:=MPE=:=======================================================*/
 {
 
-	/* ---- GA defaults: apply once per study, then never touch again ---- */
-	if (GA_DefaultsApplied != Yes) {
-	  /* YOUR two requested defaults */
-	  GA_Mode          = GA_Traj_Kronecker;   /* default mode */
-	  GA_UseFibonacci  = Yes;                 /* default: ON */
-	
-	  /* sensible seeds for the rest (only if unset/bad) */
-	  if (GA_NSpokesReq < 1) GA_NSpokesReq = 10000;
-	  if (GA_FibIndex   < 2 || GA_FibIndex > 45) GA_FibIndex = 19;  /* F(19)=4181 */
-	  if (GA_FibValue   < 0) GA_FibValue = 0;
-	
-	  GA_DefaultsApplied = Yes;               /* lock in so we don’t re-default */
-	}
 
 	/* ---- GA derive (runs every time; does not overwrite inputs) ---- */
 	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
