@@ -36,13 +36,13 @@ void loadMeth(const char *className)
     GA_UseFibonacci = Yes;                 /* default ON   */
 
     /* seed other knobs sensibly only if unset / invalid */
-    if (ParxRelsParHasValue("GA_NSpokesReq") == No || GA_NSpokesReq < 1)
+    //if (ParxRelsParHasValue("GA_NSpokesReq") == No || GA_NSpokesReq < 1)
       GA_NSpokesReq = 10000;
 
-    if (ParxRelsParHasValue("GA_FibIndex") == No || GA_FibIndex < 2 || GA_FibIndex > 45)
+    //if (ParxRelsParHasValue("GA_FibIndex") == No || GA_FibIndex < 2 || GA_FibIndex > 45)
       GA_FibIndex = 19;  /* F(19)=4181 */
 
-    if (ParxRelsParHasValue("GA_FibValue") == No)
+    //if (ParxRelsParHasValue("GA_FibValue") == No)
       GA_FibValue = 0;   /* derived */
 
 	GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
@@ -62,6 +62,10 @@ void loadMeth(const char *className)
   GA_NSpokesReq   = GA_NSpokesReq;
 
   /* ensure dependent arrays/tables are refreshed */
+  /* Force the editor to display the currently stored values */
+GA_RefreshUI = (GA_RefreshUI == Yes) ? No : Yes;   /* flip the hidden knob */
+GA_RefreshUIRel();
+
   backbone();
 
       DB_MSG(("loadMeth: EXIT   Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",

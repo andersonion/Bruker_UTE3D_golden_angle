@@ -355,6 +355,31 @@ void GA_UpdateSpokesRel(void)
 
 }
 
+/* Mirror stored values back into widgets & keep derived fields coherent. */
+void GA_RefreshUIRel(void)
+{
+    /* reassign inputs to themselves so PV editor rebinds widgets */
+    GA_Mode         = GA_Mode;
+    GA_UseFibonacci = GA_UseFibonacci;
+    GA_FibIndex     = GA_FibIndex;
+    GA_NSpokesReq   = GA_NSpokesReq;
+
+    /* clamp + derive exactly as GA_UpdateSpokesRel does */
+    if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
+    if (GA_FibIndex   < 2) GA_FibIndex   = 2;
+
+    if (GA_UseFibonacci == Yes) {
+        GA_FibValue   = fib_by_index(GA_FibIndex);
+        GA_NSpokesEff = GA_FibValue;
+    } else {
+        GA_FibValue   = 0;
+        GA_NSpokesEff = GA_NSpokesReq;
+    }
+
+    backbone();
+    DB_MSG(("GA_RefreshUI: Mode=%d UseFib=%d NReq=%d k=%d -> Fk=%d NEff=%d",
+            (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff));
+}
 
 
 

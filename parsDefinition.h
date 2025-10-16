@@ -229,6 +229,15 @@ YesNo parameter
   relations backbone;
 } GA_DefaultsApplied;
 
+/* ---- Internal: hidden UI refresh knob ---- */
+YesNo parameter
+{
+  display_name "GA Refresh (internal)";
+  short_description "Internal switch to force widgets to reflect stored values.";
+  relations GA_RefreshUIRel;    /* relation defined in parsRelations.c */
+} GA_RefreshUI;
+
+
 /****************************************************************/
 /*	E N D   O F   F I L E					*/
 /****************************************************************/
