@@ -30,38 +30,25 @@ void loadMeth(const char *className)
           (int)GA_Mode, (int)GA_UseFibonacci, GA_NSpokesReq, GA_FibIndex, GA_FibValue, GA_NSpokesEff, (int)GA_DefaultsApplied));
 
 
-	/* Only seed if we've never done it on this node */
+	/* ---- Apply our defaults exactly once on this node ---- */
 	if (ParxRelsParHasValue("GA_DefaultsApplied") == No || GA_DefaultsApplied != Yes) {
+		/* Unconditional seeds (do NOT guard these) */
+		GA_Mode         = GA_Traj_Kronecker;   /* default trajectory */
+		GA_UseFibonacci = Yes;                 /* default ON */
 	
-		/* seed MODE + FIB toggle ONCE */
-		if (ParxRelsParHasValue("GA_Mode") == No ||
-			GA_Mode < GA_Traj_UTE3D || GA_Mode > GA_Traj_LinZ_GA)
-			GA_Mode = GA_Traj_Kronecker;
+		/* Seed the rest with sanity checks (these guards are OK) */
+		if (GA_NSpokesReq < 1)                   GA_NSpokesReq = 28733; // Mimicking our defaults on regular UTE3D
+		if (GA_FibIndex   < 2 || GA_FibIndex>17) GA_FibIndex   = 19;
+		/* GA_FibValue is derived; set zero to be safe */
+		if (GA_FibValue < 0)                     GA_FibValue   = 0;
 	
-		if (ParxRelsParHasValue("GA_UseFibonacci") == No ||
-			(GA_UseFibonacci != Yes && GA_UseFibonacci != No))
-			GA_UseFibonacci = Yes;
-	
-		/* seed the rest ONLY if unset/invalid */
-		if (ParxRelsParHasValue("GA_NSpokesReq") == No || GA_NSpokesReq < 1)
-			GA_NSpokesReq = 10000;
-	
-		if (ParxRelsParHasValue("GA_FibIndex") == No || GA_FibIndex < 2 || GA_FibIndex > 45)
-			GA_FibIndex = 17;  /* F(19)=4181 */
-	
-		if (ParxRelsParHasValue("GA_FibValue") == No)
-			GA_FibValue = 0;   /* derived */
-	
-		GA_DefaultsApplied = Yes;  /* <- write the “done once” flag so we don’t reseed */
+		GA_DefaultsApplied = Yes;               /* mark as done so we never reseed */
 	}
+
 
 
   /* derive dependents so the editor shows consistent values */
   GA_UpdateSpokesRel();
-
-
-    
-
 
   /* mirror stored values back into widgets so the card displays them on revisit */
   GA_Mode         = GA_Mode;
