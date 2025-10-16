@@ -334,23 +334,23 @@ void SlewRateRange(void)
   DB_MSG(("<--SlewRateRange"));
 }
 
+/* local helpers at top of file if not present: fib_by_index as above */
+
 void GA_UpdateSpokesRel(void)
 {
-    /* sanitize inputs / defaults */
     if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
     if (GA_FibIndex   < 2) GA_FibIndex   = 2;
 
     if (GA_UseFibonacci == Yes) {
         GA_FibValue   = fib_by_index(GA_FibIndex);
-        GA_NSpokesEff = GA_FibValue;                  /* obey chosen F(k) */
+        GA_NSpokesEff = GA_FibValue;
     } else {
-        GA_FibValue   = 0;                            /* cosmetic */
-        GA_NSpokesEff = GA_NSpokesReq;                /* plain count */
-        /* If you still want "nearest Fib" when toggle is off, swap the line above for: */
-        /* GA_NSpokesEff = fib_closest_ge(GA_NSpokesReq); */
+        GA_FibValue   = 0;
+        GA_NSpokesEff = GA_NSpokesReq;
     }
 
-    backbone();  /* re-size & rebuild projections immediately */
+    backbone();   /* refresh sizes & projection tables */
 }
+
 
 

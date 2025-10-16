@@ -90,27 +90,16 @@ void initMeth()
   ProUnderRange();
   ReadGradLim = 100.0;
 
-	/* ---- GA defaults (moved from parsDefinition.h) ---- */
-	if (!ParxRelsParHasValue("GA_Mode"))          GA_Mode = GA_Traj_Kronecker;
-	/* Optional toggle; if you created GA_GradFriendly parameter */
-	#ifdef GA_GradFriendly
-	if (!ParxRelsParHasValue("GA_GradFriendly"))  GA_GradFriendly = No;
-	#endif
-	if (!ParxRelsParHasValue("GA_UseFibonacci"))  GA_UseFibonacci = No;
-	if (!ParxRelsParHasValue("GA_NSpokesReq"))    GA_NSpokesReq = 10000;
-
-	/* Defaults for new controls */
-	if (!ParxRelsParHasValue("GA_FibIndex"))  GA_FibIndex  = 19;     /* F(19)=4181 */
-	if (!ParxRelsParHasValue("GA_FibValue"))  GA_FibValue  = 0;
-	
-	/* Derive effective spokes exactly like the relation does */
+	/* sanitize ranges, but don’t change user intent */
 	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
+	if (GA_FibIndex   < 2) GA_FibIndex   = 2;
+	
 	if (GA_UseFibonacci == Yes) {
-		GA_FibValue   = fib_by_index(GA_FibIndex);
-		GA_NSpokesEff = GA_FibValue;
+	  GA_FibValue   = fib_by_index(GA_FibIndex);
+	  GA_NSpokesEff = GA_FibValue;
 	} else {
-		GA_FibValue   = 0;
-		GA_NSpokesEff = GA_NSpokesReq;
+	  GA_FibValue   = 0;                /* cosmetic only */
+	  GA_NSpokesEff = GA_NSpokesReq;
 	}
 
   if(ParxRelsParHasValue("YesNoMinEchoTime") == 0)
