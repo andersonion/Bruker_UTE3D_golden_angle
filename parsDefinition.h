@@ -158,7 +158,7 @@ GA_TrajMode parameter
   display_name "Trajectory Mode";
   short_description "Select projection ordering: packaged UTE3D, Kronecker (recommended), or linear-in-z golden angle.";
   relations backbone;
-} GA_Mode = GA_Traj_Kronecker;   /* default */
+} GA_Mode;
 
 
 YesNo parameter
@@ -177,7 +177,7 @@ int parameter
   minimum 1;
   maximum 100000000;
   relations GA_UpdateSpokesRel;
-} GA_NSpokesReq = 10000;
+} GA_NSpokesReq;
 
 int parameter
 {
@@ -188,7 +188,7 @@ int parameter
   minimum 1;
   maximum 100000000;
   relations backbone;
-} GA_NSpokesEff = 10000;
+} GA_NSpokesEff;
 
 
 YesNo parameter
@@ -196,7 +196,7 @@ YesNo parameter
   display_name "Gradient-Friendly Order";
   short_description "Traverse directions in a near-neighbor order to reduce gradient jumps (minimize slew/eddy).";
   relations backbone;
-} GA_GradFriendly = No;
+} GA_GradFriendly;
 
 
 /****************************************************************/
