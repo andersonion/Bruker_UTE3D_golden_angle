@@ -171,19 +171,18 @@ YesNo parameter
 int parameter
 {
   display_name "Requested Number of Spokes";
-  short_description "Total number of projection spokes (all frames combined).";
-  units "spokes";
+  short_description "Total number of projection spokes to acquire (all frames combined).";
   format "%d";
   minimum 1;
   maximum 100000000;
   relations GA_UpdateSpokesRel;
 } GA_NSpokesReq;
 
+
 int parameter
 {
   display_name "Effective Number of Spokes";
-  short_description "Derived spokes after applying Fibonacci constraint.";
-  units "spokes";
+  short_description "Derived number of spokes after applying the Fibonacci constraint.";
   format "%d";
   minimum 1;
   maximum 100000000;
