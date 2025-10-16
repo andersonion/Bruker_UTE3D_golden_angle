@@ -89,11 +89,18 @@ void initMeth()
   ProUnderRange();
   ReadGradLim = 100.0;
 
-	/* ---- Golden-angle / Kronecker setup ---- */
+	/* ---- GA defaults (moved from parsDefinition.h) ---- */
+	if (!ParxRelsParHasValue("GA_Mode"))          GA_Mode = GA_Traj_Kronecker;
+	if (!ParxRelsParHasValue("GA_GradFriendly"))  GA_GradFriendly = No;
+	if (!ParxRelsParHasValue("GA_UseFibonacci"))  GA_UseFibonacci = No;
+	if (!ParxRelsParHasValue("GA_NSpokesReq"))    GA_NSpokesReq = 10000;
+	
+	/* keep your existing derivation */
 	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
 	GA_NSpokesEff = (GA_UseFibonacci == Yes)
 					  ? fib_closest_ge(GA_NSpokesReq)
 					  : GA_NSpokesReq;
+
 
 
   if(ParxRelsParHasValue("YesNoMinEchoTime") == 0)
