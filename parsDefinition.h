@@ -197,6 +197,30 @@ YesNo parameter
   relations backbone;
 } GA_GradFriendly;
 
+/* ================================================================
+   ---- Fibonacci Target (optional when GA_UseFibonacci==Yes) ----
+   ================================================================ */
+
+int parameter
+{
+  display_name "Fibonacci Index (k)";
+  short_description "When 'Force Fibonacci' is Yes, set the target Fibonacci index k so that N_spokes = F(k).";
+  format "%d";
+  minimum 2;
+  maximum 45;        /* F(45) ~ 1,134,903,170: plenty */
+  relations GA_UpdateSpokesRel;
+} GA_FibIndex;
+
+int parameter
+{
+  display_name "Fibonacci Value F(k) (derived)";
+  short_description "Derived Fibonacci number for the selected index k.";
+  format "%d";
+  minimum 1;
+  maximum 2000000000;
+  relations backbone;     /* read-only display; computed in relations/init */
+} GA_FibValue;
+
 
 /****************************************************************/
 /*	E N D   O F   F I L E					*/

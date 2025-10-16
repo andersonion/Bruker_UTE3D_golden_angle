@@ -96,12 +96,20 @@ void initMeth()
 	#endif
 	if (!ParxRelsParHasValue("GA_UseFibonacci"))  GA_UseFibonacci = No;
 	if (!ParxRelsParHasValue("GA_NSpokesReq"))    GA_NSpokesReq = 10000;
+
+	/* Defaults for new controls */
+	if (!ParxRelsParHasValue("GA_FibIndex"))  GA_FibIndex  = 19;     /* F(19)=4181 */
+	if (!ParxRelsParHasValue("GA_FibValue"))  GA_FibValue  = 0;
 	
-	/* keep your existing derivation */
+	/* Derive effective spokes exactly like the relation does */
 	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
-	GA_NSpokesEff = (GA_UseFibonacci == Yes)
-					  ? fib_closest_ge(GA_NSpokesReq)
-					  : GA_NSpokesReq;
+	if (GA_UseFibonacci == Yes) {
+		GA_FibValue   = fib_by_index(GA_FibIndex);
+		GA_NSpokesEff = GA_FibValue;
+	} else {
+		GA_FibValue   = 0;
+		GA_NSpokesEff = GA_NSpokesReq;
+	}
 
   if(ParxRelsParHasValue("YesNoMinEchoTime") == 0)
     YesNoMinEchoTime = Yes;

@@ -109,6 +109,8 @@ Description: Layout of routine parameter editor for method UTE3D.
             <column>
                 <parameter name="GA_Mode"           displayName="Trajectory Mode"/>
                 <parameter name="GA_UseFibonacci"   displayName="Force Fibonacci Spoke Count"/>
+                <parameter name="GA_FibIndex"     displayName="Fibonacci Index (k)"/>
+				<parameter name="GA_FibValue"     displayName="Fibonacci Value F(k)"/>
                 <parameter name="GA_NSpokesReq"     displayName="Requested Number of Spokes"/>
                 <parameter name="GA_NSpokesEff"     displayName="Effective Number of Spokes"/>
             </column>

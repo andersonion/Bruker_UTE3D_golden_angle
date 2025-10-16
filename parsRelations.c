@@ -31,6 +31,14 @@ static int fib_closest_ge(int n)
   return b;
 }
 
+/* local helpers */
+static int fib_by_index(int k)
+{
+  if (k <= 1) return 1;
+  int a = 1, b = 1;
+  for (int i = 2; i <= k; ++i) { int t = a + b; a = b; b = t; }
+  return b;
+}
 
 /*-----------------------------------------------
  * Range checking and default relation routines
@@ -328,10 +336,21 @@ void SlewRateRange(void)
 
 void GA_UpdateSpokesRel(void)
 {
+    /* sanitize inputs / defaults */
     if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
-    GA_NSpokesEff = (GA_UseFibonacci == Yes)
-                      ? fib_closest_ge(GA_NSpokesReq)
-                      : GA_NSpokesReq;
-    backbone();
+    if (GA_FibIndex   < 2) GA_FibIndex   = 2;
+
+    if (GA_UseFibonacci == Yes) {
+        GA_FibValue   = fib_by_index(GA_FibIndex);
+        GA_NSpokesEff = GA_FibValue;                  /* obey chosen F(k) */
+    } else {
+        GA_FibValue   = 0;                            /* cosmetic */
+        GA_NSpokesEff = GA_NSpokesReq;                /* plain count */
+        /* If you still want "nearest Fib" when toggle is off, swap the line above for: */
+        /* GA_NSpokesEff = fib_closest_ge(GA_NSpokesReq); */
+    }
+
+    backbone();  /* re-size & rebuild projections immediately */
 }
+
 
