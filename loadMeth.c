@@ -26,6 +26,10 @@ void loadMeth(const char *className)
 {
   (void)className;
   /* no GA defaults here; defaults are handled once in initMeth via GA_DefaultsApplied */
+  /* Ensure derived values are up-to-date the first time the editor appears */
+	GA_UpdateSpokesRel();
+	backbone();
+
 }
 
 
