@@ -18,9 +18,10 @@ static const char resid[] = "$Id: loadMeth.c,v 1.3 2011/05/04 10:54:35 wemch Exp
 #define DEBUG		0
 #define DB_MODULE	0
 #define DB_LINE_NR	0
+/* loadMeth.c — golden_angle_UTE3D */
 
-#include "relProtos.h"
 #include "method.h"
+#include "relProtos.h"
 
 void loadMeth(const char *className)
 {
@@ -28,33 +29,32 @@ void loadMeth(const char *className)
 
   /* ---- Apply our two defaults once per protocol ---- */
   if (ParxRelsParHasValue("GA_DefaultsApplied") == No || GA_DefaultsApplied != Yes) {
-    GA_Mode          = GA_Traj_Kronecker;   /* default */
-    GA_UseFibonacci  = Yes;                 /* default ON */
+    /* required defaults */
+    GA_Mode         = GA_Traj_Kronecker;   /* default mode */
+    GA_UseFibonacci = Yes;                 /* default ON   */
 
-    /* seed other knobs sensibly only if unset */
-    if (ParxRelsParHasValue("GA_NSpokesReq") == No || GA_NSpokesReq < 1) GA_NSpokesReq = 10000;
-    if (ParxRelsParHasValue("GA_FibIndex")   == No || GA_FibIndex   < 2 || GA_FibIndex > 45) GA_FibIndex = 19;
-    if (ParxRelsParHasValue("GA_FibValue")   == No) GA_FibValue = 0;
+    /* seed other knobs sensibly only if unset / invalid */
+    if (ParxRelsParHasValue("GA_NSpokesReq") == No || GA_NSpokesReq < 1)
+      GA_NSpokesReq = 10000;
 
-    GA_DefaultsApplied = Yes;               /* <-- persists with the protocol */
+    if (ParxRelsParHasValue("GA_FibIndex") == No || GA_FibIndex < 2 || GA_FibIndex > 45)
+      GA_FibIndex = 19;  /* F(19)=4181 */
+
+    if (ParxRelsParHasValue("GA_FibValue") == No)
+      GA_FibValue = 0;   /* derived */
+
+    GA_DefaultsApplied = Yes;              /* persist the fact we’ve seeded once */
   }
 
-  /* Derive dependents so the editor shows correct values */
+  /* derive dependents so the editor shows consistent values */
   GA_UpdateSpokesRel();
 
-  /* Mirror current stored values back to widgets so the card displays them */
+  /* mirror stored values back into widgets so the card displays them on revisit */
   GA_Mode         = GA_Mode;
   GA_UseFibonacci = GA_UseFibonacci;
   GA_FibIndex     = GA_FibIndex;
   GA_NSpokesReq   = GA_NSpokesReq;
 
+  /* ensure dependent arrays/tables are refreshed */
   backbone();
 }
-);  /* ensure any dependent arrays are up-to-date in the UI */
-}
-
-/* ***************************************************************/
-/*		E N D   O F   F I L E				 */
-/* ***************************************************************/
-
-
