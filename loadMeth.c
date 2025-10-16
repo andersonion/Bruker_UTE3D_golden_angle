@@ -26,20 +26,46 @@ static const char resid[] = "$Id: loadMeth.c,v 1.3 2011/05/04 10:54:35 wemch Exp
 void loadMeth(const char *className)
 {
   DB_MSG(( "-->UTE3D:loadMeth( %s )", className ));
-/* ---- GA one-time defaults (persist across sessions) ----
-   IMPORTANT: ParxRelsParHasValue returns Yes/No, so test '== No'
+* ---- GA one-time defaults (persist across sessions) ----
+   We explicitly test BOTH "no value yet" AND invalid ranges.
+   This avoids the 2/1/0/1 garbage you saw.
 */
-if (ParxRelsParHasValue("GA_Mode")         == No) GA_Mode         = GA_Traj_Kronecker;
-if (ParxRelsParHasValue("GA_UseFibonacci") == No) GA_UseFibonacci = No;
-if (ParxRelsParHasValue("GA_NSpokesReq")   == No) GA_NSpokesReq   = 10000;
-if (ParxRelsParHasValue("GA_FibIndex")     == No) GA_FibIndex     = 19;   /* default F(19)=4181 */
-if (ParxRelsParHasValue("GA_FibValue")     == No) GA_FibValue     = 0;
+{
+  int hv;
 
-/* Optionally derive once so the UI looks right on first open */
-#ifdef GA_UpdateSpokesRel
-GA_UpdateSpokesRel();   /* requires relProtos.h; otherwise omit and let InitMeth derive */
-#endif
+  hv = ParxRelsParHasValue("GA_Mode");
+  if (hv == No || GA_Mode < GA_Traj_UTE3D || GA_Mode > GA_Traj_LinZ_GA) {
+    GA_Mode = GA_Traj_Kronecker;
+    DB_MSG(("GA default: GA_Mode := GA_Traj_Kronecker"));
+  }
 
+  hv = ParxRelsParHasValue("GA_UseFibonacci");
+  if (hv == No || (GA_UseFibonacci != Yes && GA_UseFibonacci != No)) {
+    GA_UseFibonacci = No;
+    DB_MSG(("GA default: GA_UseFibonacci := No"));
+  }
+
+  hv = ParxRelsParHasValue("GA_NSpokesReq");
+  if (hv == No || GA_NSpokesReq < 1) {
+    GA_NSpokesReq = 10000;
+    DB_MSG(("GA default: GA_NSpokesReq := %d", GA_NSpokesReq));
+  }
+
+  hv = ParxRelsParHasValue("GA_FibIndex");
+  if (hv == No || GA_FibIndex < 2 || GA_FibIndex > 45) {
+    GA_FibIndex = 19;  /* F(19)=4181 (handy) */
+    DB_MSG(("GA default: GA_FibIndex := %d", GA_FibIndex));
+  }
+
+  hv = ParxRelsParHasValue("GA_FibValue");
+  if (hv == No) {
+    GA_FibValue = 0;   /* derived later */
+    DB_MSG(("GA default: GA_FibValue := %d", GA_FibValue));
+  }
+
+  /* derive once so the editor shows the correct effective spokes on first open */
+  GA_UpdateSpokesRel();
+}
 
 
   if (0 != className)
