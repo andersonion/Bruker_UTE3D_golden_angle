@@ -15,12 +15,12 @@
 /* **************************************************************/
 /*	TYPEDEF's						*/
 /* **************************************************************/
-/* ---- Trajectory selection enum ---- */
+/* ---- Trajectory selection enum type ---- */
 typedef enum
 {
-  GA_Traj_UTE3D = 0,
-  GA_Traj_Kronecker = 1,
-  GA_Traj_LinZ_GA = 2
+  GA_Traj_UTE3D,
+  GA_Traj_Kronecker,
+  GA_Traj_LinZ_GA
 } GA_TrajMode;
 
 
