@@ -15,9 +15,9 @@
 
 static const char resid[] = "$Id: initMeth.c,v 1.31 2013/05/22 10:55:23 sako Exp $ (C) 2009 Bruker BioSpin MRI GmbH";
 
-#define DEBUG		0
-#define DB_MODULE       0
-#define DB_LINE_NR	0
+#define DEBUG		1
+#define DB_MODULE       1
+#define DB_LINE_NR	1
 
 
 

@@ -16,9 +16,9 @@
 
 static const char resid[] = "$Id: parsRelations.c,v 1.20 2013/06/14 14:02:41 sako Exp $ (C) 2009 Bruker BioSpin MRI GmbH";
 
-#define DEBUG		0
-#define DB_MODULE	0
-#define DB_LINE_NR	0
+#define DEBUG		1
+#define DB_MODULE	1
+#define DB_LINE_NR	1
 
 #include "method.h"
 
