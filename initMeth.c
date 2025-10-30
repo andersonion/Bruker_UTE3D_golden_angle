@@ -35,22 +35,9 @@ static int fib_by_index(int k){
 void initMeth()
 /*:=MPE=:=======================================================*/
 {
-
-	RecoOnline = No;
-
-	/* ---- GA derive (runs every time; does not overwrite inputs) ---- */
-	if (GA_NSpokesReq < 1) GA_NSpokesReq = 1;
-	if (GA_FibIndex   < 2) GA_FibIndex   = 2;
-	
-	if (GA_UseFibonacci == Yes) {
-	  GA_FibValue   = fib_by_index(GA_FibIndex);  /* make sure fib_by_index is defined above */
-	  GA_NSpokesEff = GA_FibValue;
-	} else {
-	  GA_FibValue   = 0;
-	  GA_NSpokesEff = GA_NSpokesReq;
-	}
-
-
+	/* Centralized GA derivation */
+	extern void GA_UpdateSpokesRel(void);
+	GA_UpdateSpokesRel();
 
   int dimRange[2]   = {3, 3};
   int lowMat[3]     = {16, 16, 16};
@@ -163,7 +150,10 @@ void initMeth()
    * Once all parameters have initial values, the backbone is called
    * to assure they are consistent 
    */
-  
+  /* Ensure GA spokes are derived on method initialization */
+	extern void GA_UpdateSpokesRel(void);
+	GA_UpdateSpokesRel();
+
   backbone();
  
 DB_MSG(("initMeth: Mode=%d  UseFib=%d  NReq=%d  k=%d  Fk=%d  NEff=%d  DefApplied=%d",

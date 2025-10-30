@@ -130,8 +130,17 @@ void backbone(void)
     RampCompTime = 0.0;
   }
   
- /* setting number of radial projections */
-  SetNPro();
+  
+	/* Make sure GA_NSpokesEff is valid before computing NPro */
+	extern void GA_UpdateSpokesRel(void);
+	GA_UpdateSpokesRel();
+	
+	/* setting number of radial projections */
+	SetNPro();
+	
+	/* safety: never let STB_UpdateTraj see a degenerate NPro */
+	if (NPro < 2) NPro = 2;
+
 
   /* handling of modules */
   double spoilerThick = MIN_OF(MIN_OF(PVM_SpatResol[0]*PVM_EncZf[0],PVM_SpatResol[1]*PVM_EncZf[1]),PVM_SpatResol[2]*PVM_EncZf[2]); 
@@ -155,7 +164,12 @@ void backbone(void)
 
   /* update trajectory module */
   double gradAmp[3]={ReadGrad, PhaseGrad, SliceGrad};
-  double nPoints = PVM_DigNp+RampPoints; 
+	double nPoints = PVM_DigNp + RampPoints;
+	if (nPoints < 4) {
+	  DB_MSG(("nPoints %g too small; using minimal 4.", nPoints));
+	  nPoints = 4;
+	}
+
 
   STB_UpdateTraj(PVM_SpatResol, PVM_EncZf, PVM_Fov, 3, NPro, nPoints, 0, PVM_DigDw, gradAmp,
                  PtrType3x3 PVM_SPackArrGradOrient[0], PVM_TriggerModule, GradSync, 0.5, 0.0, GradRes, gradAmp); 
